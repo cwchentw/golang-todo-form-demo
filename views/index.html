@@ -1,30 +1,33 @@
 {{ block "content" . }}
 
 <h1 class='text-center'>{{ .Title }}</h1>
-<form>
+<form action='/todo/' method='POST'>
     <div class='row'>
         <div class='offset-lg-1 col-lg-8 offset-md-1 col-md-7' style='margin-bottom: 5pt;'>
-            <input type='text' class='form-control' placeholder='Something to do.'>
+
+            <input type='text' class='form-control' name='todo' placeholder='Something to do.'>
         </div>
 
         <div class='col-lg-3 col-md-4'>
             <button class='btn btn-primary'>Add</button>
         </div>
-
-        {{ range $t := .TODOs }}
-        <div class='offset-lg-1 col-lg-8 offset-md-1 col-md-7 todo' style='margin-top: 5pt; margin-bottom: 5pt;'>
-            <label class='col-form-label'>{{ $t.Item }}</label>
-            <span hidden>{{ $t.Index }}</span>
-        </div>
-
-        <div class='col-lg-3 col-md-4'>
-            <button class='btn btn-secondary'>Update</button>
-
-            <button class='btn btn-info'>Delete</button>
-        </div>
-        {{ end }}
     </div>
 </form>
+
+<div class='row'>
+    {{ range $t := .TODOs }}
+    <div class='offset-lg-1 col-lg-8 offset-md-1 col-md-7 todo' style='margin-top: 5pt; margin-bottom: 5pt;'>
+        <label class='col-form-label'>{{ $t.Item }}</label>
+        <span hidden>{{ $t.Index }}</span>
+    </div>
+
+    <div class='col-lg-3 col-md-4'>
+        <button class='btn btn-secondary'>Update</button>
+
+        <button class='btn btn-info'>Delete</button>
+    </div>
+    {{ end }}
+</div>
 
 {{ if .Message }}
 <div class='offset-lg-2 col-lg-8 offset-md-1 col-md-10 col-sm-12'>

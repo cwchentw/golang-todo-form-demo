@@ -25,8 +25,8 @@ type TODO struct {
 
 // TODOModel represents the model of a TODO list.
 type TODOModel struct {
-	ID   uint   `gorm:"PRIMARY_KEY,AUTO_INCREMENT"`
-	Item string `gorm:"todo"`
+	ID   uint `gorm:"PRIMARY_KEY,AUTO_INCREMENT"`
+	Todo string
 }
 
 // TableName set the name of the table.
@@ -86,6 +86,9 @@ func main() {
 	// Listen to the index page.
 	mux.GET("/", indexHandler)
 
+	// Respond to new TODO item.
+	mux.POST("/todo/", newTODOHandler)
+
 	// Handle HTTP 404
 	mux.NotFound = http.HandlerFunc(notFoundHandler)
 
@@ -120,6 +123,13 @@ func indexHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	)
 
 	var msg string
+
+	if r.Header.Get("Message") != "" {
+		msg = r.Header.Get("Message")
+
+		// Clean current message.
+		r.Header.Set("Message", "")
+	}
 
 	rows, err := db.Table("todos").Select("*").Rows()
 	if err != nil {
@@ -158,4 +168,22 @@ func indexHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
+}
+
+func newTODOHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	r.ParseForm()
+
+	todo := r.FormValue("todo")
+
+	if todo == "" {
+		r.Header.Add("Message", "Empty TODO item")
+	} else {
+		db.Table("todos").Create(struct {
+			Todo string `gorm:"todo"`
+		}{
+			Todo: todo,
+		})
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
