@@ -23,6 +23,17 @@ type TODO struct {
 	Index uint
 }
 
+// TODOModel represents the model of a TODO list.
+type TODOModel struct {
+	Index uint `gorm:"primary_key,auto_increment"`
+	Item  string
+}
+
+// TableName set the name of the table.
+func (TODOModel) TableName() string {
+	return "todos"
+}
+
 var db *gorm.DB
 
 func main() {
@@ -53,6 +64,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+
+	if !db.HasTable("todos") {
+		db.CreateTable(&TODOModel{})
+	}
 
 	/* Set the routes for the web application. */
 	mux := httprouter.New()
