@@ -115,8 +115,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	)
 
 	data := struct {
-		Title string
-		TODOs []TODO
+		Title   string
+		TODOs   []TODO
+		Message string
 	}{
 		Title: "TODO List",
 		TODOs: []TODO{
@@ -124,6 +125,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 			{"456", 2},
 			{"789", 3},
 		},
+		Message: "Nothing wrong",
 	}
 
 	err := tmpl.ExecuteTemplate(w, "layout", data)
