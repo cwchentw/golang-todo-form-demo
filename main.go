@@ -25,8 +25,8 @@ type TODO struct {
 
 // TODOModel represents the model of a TODO list.
 type TODOModel struct {
-	Index uint `gorm:"primary_key,auto_increment"`
-	Item  string
+	ID   uint   `gorm:"PRIMARY_KEY,AUTO_INCREMENT"`
+	Item string `gorm:"todo"`
 }
 
 // TableName set the name of the table.
@@ -36,7 +36,23 @@ func (TODOModel) TableName() string {
 
 var db *gorm.DB
 
+func init() {
+	var err error
+
+	/* Use SQLite in memory for testing purpose. */
+	db, err = gorm.Open("sqlite3", ":memory:")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if !db.HasTable(&TODOModel{}) {
+		db.CreateTable(&TODOModel{})
+	}
+}
+
 func main() {
+	defer db.Close()
+
 	host := "127.0.0.1"
 	port := "8080"
 
@@ -56,17 +72,6 @@ func main() {
 		} else {
 			log.Fatal(fmt.Sprintf("Unknown parameter: %s", args[0]))
 		}
-	}
-
-	/* Use SQLite in memory for testing purpose. */
-	db, err := gorm.Open("sqlite3", ":memory:")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	if !db.HasTable("todos") {
-		db.CreateTable(&TODOModel{})
 	}
 
 	/* Set the routes for the web application. */
@@ -114,21 +119,42 @@ func indexHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		template.ParseFiles("views/layout.html", "views/index.html", "views/head.html"),
 	)
 
+	var msg string
+
+	rows, err := db.Table("todos").Select("*").Rows()
+	if err != nil {
+		msg = "Unable to retrieve database"
+	}
+
+	var todos []TODO
+
+	todos = make([]TODO, 0)
+
+	for rows.Next() {
+		var todo struct {
+			ID   uint
+			Todo string `gorm:"todo"`
+		}
+
+		db.ScanRows(rows, &todo)
+
+		todos = append(todos, TODO{
+			Index: todo.ID,
+			Item:  todo.Todo,
+		})
+	}
+
 	data := struct {
 		Title   string
 		TODOs   []TODO
 		Message string
 	}{
-		Title: "TODO List",
-		TODOs: []TODO{
-			{"123", 1},
-			{"456", 2},
-			{"789", 3},
-		},
-		Message: "Nothing wrong",
+		Title:   "TODO List",
+		TODOs:   todos,
+		Message: msg,
 	}
 
-	err := tmpl.ExecuteTemplate(w, "layout", data)
+	err = tmpl.ExecuteTemplate(w, "layout", data)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
