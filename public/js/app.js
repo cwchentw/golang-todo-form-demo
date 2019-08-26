@@ -13,18 +13,23 @@ document.addEventListener('DOMContentLoaded', function () {
                         let input = document.createElement('input');
     
                         input.classList.add('form-control');
+                        input.name = 'todo';
                         input.value = text;
 
-                        let index = todos[j].querySelector('span').innerText;
+                        let index = todos[j].querySelector('[name="index"]').getAttribute('value');
 
-                        let span = document.createElement('span');
+                        console.log(todos[j].querySelector('[name="index"]'));
+                        console.log(`index: ${index}`);
 
-                        span.innerText = index;
-                        span.setAttribute('hidden', true);
+                        let inputIndex = document.createElement('input');
+
+                        inputIndex.setAttribute('value', index);
+                        inputIndex.name = 'index'
+                        inputIndex.setAttribute('hidden', true);
     
                         todos[i].innerHTML = '';
                         todos[i].appendChild(input);
-                        todos[i].appendChild(span);
+                        todos[i].appendChild(inputIndex);
                     }
                 } else {
                     if (!label) {
@@ -37,16 +42,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         label.classList.add('col-form-label');
                         label.innerText = text;
 
-                        let index = todos[j].querySelector('span').innerText;
+                        let index = todos[j].querySelector('[name="index"]').getAttribute('value');
 
-                        let span = document.createElement('span');
+                        let inputIndex = document.createElement('input');
 
-                        span.innerText = index;
-                        span.setAttribute('hidden', true);
+                        inputIndex.setAttribute('value', index);
+                        inputIndex.name = 'index'
+                        inputIndex.setAttribute('hidden', true);
 
                         todos[j].innerHTML = '';
                         todos[j].appendChild(label);
-                        todos[j].appendChild(span);
+                        todos[j].appendChild(inputIndex);
                     }
                 }
             }
@@ -68,16 +74,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     label.classList.add('col-form-label');
                     label.innerText = text;
 
-                    let index = todos[i].querySelector('span').innerText;
+                    let index = todos[i].querySelector('[name="index"]').getAttribute('value');
 
-                    let span = document.createElement('span');
+                    let inputIndex = document.createElement('input');
 
-                    span.innerText = index;
-                    span.setAttribute('hidden', true);
+                    inputIndex.setAttribute('value', index);
+                    inputIndex.name = 'index'
+                    inputIndex.setAttribute('hidden', true);
 
                     todos[i].innerHTML = '';
                     todos[i].appendChild(label);
-                    todos[i].appendChild(span);
+                    todos[i].appendChild(inputIndex);
                 }
             }
         }

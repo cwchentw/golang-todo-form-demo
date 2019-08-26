@@ -14,20 +14,24 @@
     </div>
 </form>
 
-<div class='row'>
-    {{ range $t := .TODOs }}
-    <div class='offset-lg-1 col-lg-8 offset-md-1 col-md-7 todo' style='margin-top: 5pt; margin-bottom: 5pt;'>
-        <label class='col-form-label'>{{ $t.Item }}</label>
-        <span hidden>{{ $t.Index }}</span>
-    </div>
 
-    <div class='col-lg-3 col-md-4'>
-        <button class='btn btn-secondary'>Update</button>
+{{ range $t := .TODOs }}
+<form action='/todo/' method='POST'>
+    <div class='row'>
+        <div class='offset-lg-1 col-lg-8 offset-md-1 col-md-7 todo' style='margin-top: 5pt; margin-bottom: 5pt;'>
+            <label class='col-form-label'>{{ $t.Item }}</label>
+            <inupt name='index' value='{{ $t.Index }}' hidden>
+        </div>
 
-        <button class='btn btn-info'>Delete</button>
+        <div class='col-lg-3 col-md-4'>
+            <button type='submit' value='update' class='btn btn-secondary'>Update</button>
+
+            <button type='submit' value='delete' class='btn btn-info'>Delete</button>
+        </div>
     </div>
-    {{ end }}
-</div>
+</form>
+{{ end }}
+
 
 {{ if .Message }}
 <div class='offset-lg-2 col-lg-8 offset-md-1 col-md-10 col-sm-12'>
