@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"text/template"
 
 	"github.com/jinzhu/gorm"
 	negronilogrus "github.com/meatballhat/negroni-logrus"
@@ -15,6 +16,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/negroni"
 )
+
+// TODO represents single TODO item.
+type TODO struct {
+	Item  string
+	Index uint
+}
 
 var db *gorm.DB
 
@@ -49,6 +56,16 @@ func main() {
 
 	/* Set the routes for the web application. */
 	mux := httprouter.New()
+
+	// Listen to CSS assets
+	mux.ServeFiles("/css/*filepath", http.Dir("public/css"))
+
+	// Listen to JavaScript assets
+	mux.ServeFiles("/js/*filepath", http.Dir("public/js"))
+
+	// Listen to the index page.
+	mux.GET("/", indexHandler)
+
 	// Handle HTTP 404
 	mux.NotFound = http.HandlerFunc(notFoundHandler)
 
@@ -75,4 +92,27 @@ func main() {
 
 	log.Println(fmt.Sprintf("Run the web server at %s:%s", host, port))
 	log.Fatal(server.ListenAndServe())
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	var tmpl = template.Must(
+		template.ParseFiles("views/layout.html", "views/index.html", "views/head.html"),
+	)
+
+	data := struct {
+		Title string
+		TODOs []TODO
+	}{
+		Title: "TODO List",
+		TODOs: []TODO{
+			{"123", 1},
+			{"456", 2},
+			{"789", 3},
+		},
+	}
+
+	err := tmpl.ExecuteTemplate(w, "layout", data)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 }
