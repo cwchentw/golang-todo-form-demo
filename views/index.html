@@ -20,13 +20,13 @@
     <div class='row'>
         <div class='offset-lg-1 col-lg-8 offset-md-1 col-md-7 todo' style='margin-top: 5pt; margin-bottom: 5pt;'>
             <label class='col-form-label'>{{ $t.Item }}</label>
-            <inupt name='index' value='{{ $t.Index }}' hidden>
+            <inupt name='index' name='index' value='{{ $t.Index }}' hidden>
         </div>
 
         <div class='col-lg-3 col-md-4'>
-            <button type='submit' value='update' class='btn btn-secondary'>Update</button>
+            <button type='submit' name='update' class='btn btn-secondary'>Update</button>
 
-            <button type='submit' value='delete' class='btn btn-info'>Delete</button>
+            <button type='submit' name='delete' class='btn btn-info'>Delete</button>
         </div>
     </div>
 </form>
