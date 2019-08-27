@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"text/template"
 
 	"github.com/jinzhu/gorm"
 	negronilogrus "github.com/meatballhat/negroni-logrus"
@@ -12,7 +11,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/negroni"
 )
@@ -87,23 +85,15 @@ func main() {
 	mux.GET("/", indexHandler)
 
 	// Respond to new TODO item.
-	mux.POST("/todo/", newTODOHandler)
+	mux.POST("/todo/", updateTODOHandler)
 
 	// Handle HTTP 404
 	mux.NotFound = http.HandlerFunc(notFoundHandler)
-
-	// Handle CORS policy
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
-		AllowCredentials: true,
-		Debug:            true,
-	})
 
 	/* Create the logger for the web application. */
 	l := log.New()
 
 	n := negroni.New()
-	n.Use(c)
 	n.Use(negronilogrus.NewMiddlewareFromLogger(l, "web"))
 	n.UseHandler(mux)
 
@@ -115,75 +105,4 @@ func main() {
 
 	log.Println(fmt.Sprintf("Run the web server at %s:%s", host, port))
 	log.Fatal(server.ListenAndServe())
-}
-
-func indexHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	var tmpl = template.Must(
-		template.ParseFiles("views/layout.html", "views/index.html", "views/head.html"),
-	)
-
-	var msg string
-
-	if r.Header.Get("Message") != "" {
-		msg = r.Header.Get("Message")
-
-		// Clean current message.
-		r.Header.Set("Message", "")
-	}
-
-	rows, err := db.Table("todos").Select("*").Rows()
-	if err != nil {
-		msg = "Unable to retrieve database"
-	}
-
-	var todos []TODO
-
-	todos = make([]TODO, 0)
-
-	for rows.Next() {
-		var todo struct {
-			ID   uint
-			Todo string `gorm:"todo"`
-		}
-
-		db.ScanRows(rows, &todo)
-
-		todos = append(todos, TODO{
-			Index: todo.ID,
-			Item:  todo.Todo,
-		})
-	}
-
-	data := struct {
-		Title   string
-		TODOs   []TODO
-		Message string
-	}{
-		Title:   "TODO List",
-		TODOs:   todos,
-		Message: msg,
-	}
-
-	err = tmpl.ExecuteTemplate(w, "layout", data)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
-}
-
-func newTODOHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	r.ParseForm()
-
-	todo := r.FormValue("todo")
-
-	if todo == "" {
-		r.Header.Add("Message", "Empty TODO item")
-	} else {
-		db.Table("todos").Create(struct {
-			Todo string `gorm:"todo"`
-		}{
-			Todo: todo,
-		})
-	}
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
