@@ -32,11 +32,12 @@
 </form>
 {{ end }}
 
-
 {{ if .Message }}
-<div class='offset-lg-2 col-lg-8 offset-md-1 col-md-10 col-sm-12'>
-    <div class="alert alert-warning" role="alert">
-        {{ .Message }}
+<div class='row'>
+    <div class='offset-lg-2 col-lg-8 offset-md-1 col-md-10 col-sm-12'>
+        <div class="alert alert-warning" role="alert">
+            {{ .Message }}
+        </div>
     </div>
 </div>
 {{ end }}
