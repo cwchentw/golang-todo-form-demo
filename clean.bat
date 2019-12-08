@@ -1,0 +1,1 @@
+del app.exe
