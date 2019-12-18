@@ -7,9 +7,15 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func indexHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func indexHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+	p httprouter.Params) {
 	var tmpl = template.Must(
-		template.ParseFiles("views/layout.html", "views/index.html", "views/head.html"),
+		template.ParseFiles(
+			"views/layout.html",
+			"views/index.html",
+			"views/head.html"),
 	)
 
 	var msg string
@@ -60,7 +66,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 }
 
-func updateTODOHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func updateTODOHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+	p httprouter.Params) {
 	r.ParseForm()
 
 	todo := r.FormValue("todo")
