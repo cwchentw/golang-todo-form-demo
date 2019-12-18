@@ -28,7 +28,7 @@ By default, the app will run on http://127.0.0.1:8080/ . Use `-h` (host) and `-p
 
 The app stores its data into an in-memory SQLite database. Therefore, no persistent data will be generated after the app ends.
 
-### Clean
+### Clean It
 
 Run *clean* (for Unix) or *clean.bat* (for Windows) to remove the app.
 
