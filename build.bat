@@ -1,1 +1,1 @@
-go build -o app main.go notFound.go controller.go
+go build -o app.app main.go notFound.go controller.go
